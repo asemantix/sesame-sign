@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SÉSAME — Signature hardware-bound · Sans serveur</title>
+<meta name="description" content="Sésame est un outil professionnel d'échanges et de signatures de documents entre parties identifiées. Sans tiers de confiance. Sans serveur. Conforme eIDAS 2.">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f4f0;
+  --fg: #1a1a18;
+  --fg2: #3a3a36;
+  --fg3: #6a6860;
+  --fg4: #aaa89e;
+  --purple: #6655c0;
+  --purple-light: #f0eefb;
+  --purple-mid: #8877d4;
+  --gold: #9a7a28;
+  --coral: #c05038;
+  --border: rgba(0,0,0,.07);
+  --border-purple: rgba(102,85,192,.18);
+  --serif: 'Cormorant Garamond', Georgia, serif;
+  --mono: 'JetBrains Mono', monospace;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--serif);
+  overflow-x: hidden;
+}
+
+/* ── NAV ────────────────────────────────────────────────── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  padding: 20px 56px;
+  display: flex; justify-content: space-between; align-items: center;
+  background: rgba(245,244,240,.96);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-brand {
+  font-family: var(--serif); font-size: 1.1rem; font-weight: 600;
+  color: var(--purple); letter-spacing: .14em; text-decoration: none;
+}
+.nav-links { display: flex; gap: 36px; align-items: center; }
+.nav-links a {
+  font-family: var(--mono); font-size: 10px; color: var(--fg4);
+  letter-spacing: .12em; text-transform: uppercase; text-decoration: none;
+  transition: color .2s;
+}
+.nav-links a:hover { color: var(--fg3); }
+.nav-cta {
+  font-family: var(--mono); font-size: 10px; color: var(--purple);
+  letter-spacing: .1em; text-transform: uppercase;
+  text-decoration: none; padding: 9px 20px;
+  border: 1px solid var(--border-purple);
+  transition: all .2s;
+}
+.nav-cta:hover { background: var(--purple-light); }
+
+/* ── HERO ───────────────────────────────────────────────── */
+.hero {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 420px;
+  grid-template-rows: 1fr auto;
+  padding: 140px 56px 80px;
+  border-bottom: 1px solid var(--border);
+  position: relative; overflow: hidden;
+  align-items: end;
+  gap: 0 60px;
+}
+.hero::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: var(--purple);
+}
+.hero-content {
+  display: flex; flex-direction: column; justify-content: flex-end;
+}
+.hero-fingerprint {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: flex-end;
+  padding-bottom: 8px;
+  position: relative;
+}
+.hero-fingerprint svg {
+  width: 340px; height: 340px;
+  opacity: .18;
+  animation: fp-pulse 4s ease-in-out infinite;
+}
+@keyframes fp-pulse {
+  0%, 100% { opacity: .18; transform: scale(1); }
+  50% { opacity: .28; transform: scale(1.02); }
+}
+.hero-ouvretoi {
+  font-family: var(--serif);
+  font-size: clamp(1.6rem, 2.5vw, 2.2rem);
+  font-weight: 300; font-style: italic;
+  color: var(--purple); margin-top: 20px;
+  letter-spacing: .04em;
+  text-align: center;
+  opacity: 0;
+  animation: ouvretoi-appear 1s ease .8s forwards;
+}
+@keyframes ouvretoi-appear {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.hero-tag {
+  font-family: var(--mono); font-size: 10px; color: var(--purple);
+  letter-spacing: .2em; text-transform: uppercase;
+  margin-bottom: 28px; opacity: .8;
+}
+.hero-title {
+  font-size: clamp(5rem, 11vw, 9.5rem);
+  font-weight: 600; line-height: .88;
+  color: var(--purple); margin-bottom: 32px;
+  letter-spacing: -.01em;
+}
+.hero-sub {
+  font-size: clamp(1.4rem, 2.2vw, 1.8rem);
+  font-weight: 300; font-style: italic;
+  color: var(--fg3); margin-bottom: 16px;
+  max-width: 720px; line-height: 1.5;
+}
+.hero-slogan {
+  font-family: var(--mono); font-size: 11px;
+  color: var(--fg4); letter-spacing: .14em;
+  margin-bottom: 56px;
+}
+.hero-actions { display: flex; gap: 16px; flex-wrap: wrap; }
+.btn-primary {
+  font-family: var(--mono); font-size: 11px;
+  letter-spacing: .12em; text-transform: uppercase;
+  padding: 18px 32px; background: var(--purple); color: #fff;
+  text-decoration: none; transition: background .25s;
+  display: inline-flex; align-items: center; gap: 10px;
+}
+.btn-primary:hover { background: #5544aa; }
+.btn-secondary {
+  font-family: var(--mono); font-size: 11px;
+  letter-spacing: .12em; text-transform: uppercase;
+  padding: 18px 32px; color: var(--purple);
+  border: 1px solid var(--border-purple);
+  text-decoration: none; transition: all .25s;
+}
+.btn-secondary:hover { background: var(--purple-light); }
+
+/* ── HARVEST ────────────────────────────────────────────── */
+.harvest {
+  background: #1e1c2e;
+  padding: 100px 56px;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+.harvest-inner {
+  max-width: 860px; margin: 0 auto;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
+}
+.harvest-left {}
+.harvest-label {
+  font-family: var(--mono); font-size: 9px;
+  color: rgba(255,255,255,.3); letter-spacing: .2em;
+  text-transform: uppercase; margin-bottom: 28px;
+}
+.harvest-problem {
+  font-family: var(--mono); font-size: 13px;
+  color: rgba(255,255,255,.55); line-height: 2.2;
+}
+.harvest-problem span.strike {
+  text-decoration: line-through; opacity: .4;
+}
+.harvest-headline {
+  font-size: clamp(1.8rem, 3vw, 2.6rem);
+  font-weight: 300; font-style: italic;
+  color: var(--coral); line-height: 1.3;
+  margin-top: 32px;
+}
+.harvest-right {}
+.harvest-answer {
+  font-size: clamp(1.6rem, 2.5vw, 2.2rem);
+  font-weight: 300; font-style: italic;
+  color: rgba(255,255,255,.9); line-height: 1.5;
+  margin-bottom: 32px;
+}
+.harvest-answer em {
+  font-style: normal; color: #a099e8; font-weight: 600;
+}
+.harvest-never {
+  font-size: clamp(1.8rem, 3vw, 2.6rem);
+  font-weight: 600; font-style: italic;
+  color: #a099e8; line-height: 1.2;
+}
+
+/* ── MANIFESTE ──────────────────────────────────────────── */
+.manifeste {
+  padding: 100px 56px;
+  border-bottom: 1px solid var(--border);
+  display: grid; grid-template-columns: 200px 1fr; gap: 80px;
+}
+.manifeste-label {
+  font-family: var(--mono); font-size: 9px;
+  color: var(--fg4); letter-spacing: .2em;
+  text-transform: uppercase; padding-top: 8px;
+}
+.manifeste-text {}
+.manifeste-line {
+  font-size: clamp(1.3rem, 2vw, 1.7rem);
+  font-weight: 300; line-height: 1.8;
+  color: var(--fg2); margin-bottom: 4px;
+}
+.manifeste-line.strong {
+  font-weight: 600; color: var(--purple);
+}
+.manifeste-line.italic {
+  font-style: italic; color: var(--fg3);
+}
+.manifeste-sep {
+  width: 48px; height: 1px;
+  background: var(--border-purple);
+  margin: 28px 0;
+}
+
+/* ── COMMENT ────────────────────────────────────────────── */
+.comment {
+  padding: 100px 56px;
+  background: var(--purple-light);
+  border-bottom: 1px solid var(--border);
+}
+.section-label {
+  font-family: var(--mono); font-size: 9px;
+  color: var(--fg4); letter-spacing: .2em;
+  text-transform: uppercase; margin-bottom: 60px;
+}
+.steps {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 1px; background: var(--border-purple);
+}
+.step {
+  background: var(--bg); padding: 48px 40px;
+}
+.step-num {
+  font-family: var(--mono); font-size: 48px;
+  font-weight: 300; color: var(--purple);
+  opacity: .2; line-height: 1; margin-bottom: 24px;
+}
+.step-title {
+  font-size: 1.4rem; font-weight: 600;
+  color: var(--fg); margin-bottom: 14px;
+}
+.step-desc {
+  font-family: var(--mono); font-size: .8rem;
+  color: var(--fg3); line-height: 1.8;
+}
+
+/* ── POUR QUI ───────────────────────────────────────────── */
+.pourqui {
+  padding: 100px 56px;
+  border-bottom: 1px solid var(--border);
+}
+.pourqui-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1px; background: var(--border); margin-top: 60px;
+}
+.pourqui-item {
+  background: var(--bg); padding: 36px 32px;
+  transition: background .25s;
+}
+.pourqui-item:hover { background: var(--purple-light); }
+.pourqui-icon {
+  font-family: var(--mono); font-size: 9px;
+  color: var(--purple); letter-spacing: .14em;
+  text-transform: uppercase; margin-bottom: 16px;
+}
+.pourqui-title {
+  font-size: 1.2rem; font-weight: 600;
+  color: var(--fg); margin-bottom: 10px;
+}
+.pourqui-desc {
+  font-family: var(--mono); font-size: .78rem;
+  color: var(--fg3); line-height: 1.7;
+}
+
+/* ── BREVETS ────────────────────────────────────────────── */
+.brevets {
+  padding: 100px 56px;
+  background: var(--fg);
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+.brevets .section-label { color: rgba(255,255,255,.25); }
+.brevets-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 1px; background: rgba(255,255,255,.06);
+  margin-top: 60px;
+}
+.brevet-item {
+  background: #1a1a18; padding: 48px 40px;
+}
+.brevet-num {
+  font-family: var(--mono); font-size: 9px;
+  color: var(--purple-mid); letter-spacing: .18em;
+  text-transform: uppercase; margin-bottom: 20px; opacity: .7;
+}
+.brevet-title {
+  font-size: 1.5rem; font-weight: 600;
+  color: #f5f4f0; margin-bottom: 14px;
+}
+.brevet-desc {
+  font-family: var(--mono); font-size: .78rem;
+  color: rgba(255,255,255,.4); line-height: 1.8;
+}
+
+/* ── TARIFS ─────────────────────────────────────────────── */
+.tarifs {
+  padding: 100px 56px;
+  border-bottom: 1px solid var(--border);
+}
+.tarifs-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 1px; background: var(--border-purple);
+  margin-top: 60px;
+}
+.tarif {
+  background: var(--bg); padding: 40px 32px;
+  position: relative;
+}
+.tarif.featured {
+  background: var(--purple-light);
+  border-top: 3px solid var(--purple);
+}
+.tarif-tag {
+  font-family: var(--mono); font-size: 8px;
+  color: var(--fg4); letter-spacing: .14em;
+  text-transform: uppercase; margin-bottom: 20px;
+}
+.tarif.featured .tarif-tag { color: var(--purple); }
+.tarif-name {
+  font-size: 1.5rem; font-weight: 600;
+  color: var(--fg); margin-bottom: 8px;
+}
+.tarif.featured .tarif-name { color: var(--purple); }
+.tarif-price {
+  font-family: var(--mono); font-size: 2rem;
+  font-weight: 300; color: var(--fg);
+  margin-bottom: 4px; line-height: 1;
+}
+.tarif-price span {
+  font-size: .9rem; color: var(--fg4);
+}
+.tarif-desc {
+  font-family: var(--mono); font-size: .72rem;
+  color: var(--fg4); margin-bottom: 28px;
+  line-height: 1.6;
+}
+.tarif-sep {
+  height: 1px; background: var(--border);
+  margin-bottom: 24px;
+}
+.tarif-feature {
+  font-family: var(--mono); font-size: .72rem;
+  color: var(--fg3); line-height: 2;
+}
+.tarif-feature::before {
+  content: '— '; color: var(--purple); opacity: .5;
+}
+
+/* ── CONFIANCE ──────────────────────────────────────────── */
+.confiance {
+  padding: 80px 56px;
+  background: var(--purple-light);
+  border-bottom: 1px solid var(--border);
+  display: flex; justify-content: space-between;
+  align-items: center; gap: 40px; flex-wrap: wrap;
+}
+.confiance-item {
+  text-align: center;
+}
+.confiance-value {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 600; color: var(--purple);
+  line-height: 1; margin-bottom: 8px;
+}
+.confiance-label {
+  font-family: var(--mono); font-size: 9px;
+  color: var(--fg4); letter-spacing: .14em;
+  text-transform: uppercase; line-height: 1.6;
+}
+
+/* ── CONTACT ────────────────────────────────────────────── */
+.contact {
+  padding: 100px 56px;
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 100px; align-items: start;
+}
+.contact-left {}
+.contact-title {
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  font-weight: 600; line-height: 1.1;
+  margin-bottom: 24px; color: var(--fg);
+}
+.contact-sub {
+  font-family: var(--mono); font-size: .85rem;
+  color: var(--fg3); line-height: 1.9;
+  margin-bottom: 40px;
+}
+.contact-info {
+  font-family: var(--mono); font-size: .8rem;
+  color: var(--fg4); line-height: 2.2;
+}
+.contact-info a {
+  color: var(--purple); text-decoration: none;
+}
+.contact-right {}
+.form-group {
+  margin-bottom: 20px;
+}
+.form-label {
+  font-family: var(--mono); font-size: 9px;
+  color: var(--fg4); letter-spacing: .14em;
+  text-transform: uppercase; display: block;
+  margin-bottom: 8px;
+}
+.form-input, .form-select, .form-textarea {
+  width: 100%; padding: 14px 16px;
+  background: #fff; border: 1px solid var(--border);
+  font-family: var(--mono); font-size: .85rem;
+  color: var(--fg); outline: none;
+  transition: border-color .2s;
+  appearance: none;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  border-color: var(--purple);
+}
+.form-textarea { resize: vertical; min-height: 120px; }
+.form-submit {
+  width: 100%; padding: 18px;
+  background: var(--purple); color: #fff;
+  font-family: var(--mono); font-size: 11px;
+  letter-spacing: .12em; text-transform: uppercase;
+  border: none; cursor: pointer;
+  transition: background .25s;
+}
+.form-submit:hover { background: #5544aa; }
+
+/* ── FOOTER ─────────────────────────────────────────────── */
+footer {
+  padding: 32px 56px;
+  border-top: 1px solid var(--border);
+  display: flex; justify-content: space-between;
+  align-items: center; flex-wrap: wrap; gap: 20px;
+}
+.footer-brand {
+  font-family: var(--serif); font-size: 1.4rem;
+  font-weight: 600; color: var(--fg4); letter-spacing: .06em;
+}
+.footer-mid {
+  font-family: var(--mono); font-size: 9px;
+  color: var(--fg4); letter-spacing: .1em;
+  text-align: center; line-height: 1.8;
+}
+.footer-right {
+  font-family: var(--mono); font-size: 9px;
+  color: var(--purple); letter-spacing: .1em;
+  text-align: right; line-height: 1.8;
+}
+
+/* ── ANIMATIONS ─────────────────────────────────────────── */
+.fade-in {
+  opacity: 0; transform: translateY(24px);
+  transition: opacity .7s ease, transform .7s ease;
+}
+.fade-in.visible {
+  opacity: 1; transform: translateY(0);
+}
+
+/* ── RESPONSIVE ─────────────────────────────────────────── */
+@media (max-width: 900px) {
+  nav { padding: 20px 24px; }
+  .nav-links { display: none; }
+  .hero { grid-template-columns: 1fr; padding: 120px 24px 60px; }
+  .hero-fingerprint { display: none; }
+  .manifeste, .comment, .pourqui, .brevets,
+  .tarifs, .contact, footer { padding-left: 24px; padding-right: 24px; }
+  .harvest { padding: 64px 24px; }
+  .harvest-inner { grid-template-columns: 1fr; gap: 48px; }
+  .manifeste { grid-template-columns: 1fr; gap: 32px; }
+  .steps { grid-template-columns: 1fr; }
+  .brevets-grid { grid-template-columns: 1fr; }
+  .tarifs-grid { grid-template-columns: 1fr 1fr; }
+  .contact { grid-template-columns: 1fr; gap: 48px; }
+  .confiance { justify-content: center; gap: 32px; }
+  .footer-mid { display: none; }
+}
+@media (max-width: 600px) {
+  .tarifs-grid { grid-template-columns: 1fr; }
+  .hero-title { font-size: 4rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── NAV ───────────────────────────────────────────────── -->
+<nav>
+  <a class="nav-brand" href="#">SÉSAME</a>
+  <div class="nav-links">
+    <a href="#manifeste">Notre engagement</a>
+    <a href="#comment">Fonctionnement</a>
+    <a href="#tarifs">Tarifs</a>
+    <a href="#contact">Licences</a>
+  </div>
+  <a class="nav-cta" href="#contact">Nous contacter</a>
+</nav>
+
+<!-- ── HERO ──────────────────────────────────────────────── -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-tag">Signature électronique · Post-quantique · eIDAS 2</div>
+    <h1 class="hero-title">SÉSAME</h1>
+    <p class="hero-slogan">Signature hardware-bound · Sans serveur · Conforme eIDAS 2</p>
+    <div class="hero-actions">
+      <a class="btn-primary" href="#" id="play-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3 20.5v-17l18 8.5z"/></svg>
+        Télécharger — Google Play
+      </a>
+      <a class="btn-secondary" href="#contact">Licences entreprise</a>
+    </div>
+  </div>
+  <div class="hero-fingerprint">
+    <svg viewBox="0 0 200 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Noyau central — tourbillon -->
+      <path d="M100 118 C97 114 93 112 100 108 C107 104 114 108 116 114 C118 120 114 126 108 128 C102 130 95 126 93 120 C91 114 95 106 103 104 C111 102 119 108 120 116" stroke="#6655c0" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+      <!-- Arc 1 -->
+      <path d="M72 148 C72 130 82 116 94 110" stroke="#6655c0" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+      <path d="M106 106 C116 104 126 110 130 120 C134 130 132 144 128 152" stroke="#6655c0" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+      <!-- Arc 2 -->
+      <path d="M62 160 C60 140 65 122 74 112 C83 102 93 98 102 98" stroke="#6655c0" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+      <path d="M110 97 C122 98 134 106 140 118 C146 130 146 148 142 162" stroke="#6655c0" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+      <!-- Arc 3 — interrompu gauche -->
+      <path d="M52 172 C49 150 54 130 64 116 C74 102 86 94 100 92" stroke="#6655c0" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+      <path d="M112 91 C126 93 140 103 148 116" stroke="#6655c0" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+      <path d="M152 126 C156 138 156 154 154 170" stroke="#6655c0" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+      <!-- Arc 4 -->
+      <path d="M42 184 C38 160 44 136 56 120 C66 106 78 96 92 90 C96 88 100 87 104 87" stroke="#6655c0" stroke-width="1.1" fill="none" stroke-linecap="round"/>
+      <path d="M116 88 C130 91 144 100 154 114 C164 128 166 148 164 166 C162 180 158 190 154 198" stroke="#6655c0" stroke-width="1.1" fill="none" stroke-linecap="round"/>
+      <!-- Arc 5 — interrompu droite -->
+      <path d="M34 198 C28 172 34 144 48 126 C58 112 70 102 84 96 C90 93 96 91 102 90" stroke="#6655c0" stroke-width="1.1" fill="none" stroke-linecap="round"/>
+      <path d="M114 90 C128 92 142 100 152 113" stroke="#6655c0" stroke-width="1.1" fill="none" stroke-linecap="round"/>
+      <path d="M158 124 C166 140 168 160 166 180 C164 196 160 210 156 220" stroke="#6655c0" stroke-width="1.1" fill="none" stroke-linecap="round"/>
+      <!-- Arc 6 — large -->
+      <path d="M28 212 C20 184 26 154 40 132 C52 114 66 102 82 96" stroke="#6655c0" stroke-width="1" fill="none" stroke-linecap="round" opacity=".8"/>
+      <path d="M116 92 C132 94 148 104 160 118 C172 134 176 156 174 178 C172 198 166 214 160 226" stroke="#6655c0" stroke-width="1" fill="none" stroke-linecap="round" opacity=".8"/>
+      <!-- Arc 7 — très large, s'interrompt -->
+      <path d="M22 226 C12 196 18 162 34 138 C46 118 62 106 80 98" stroke="#6655c0" stroke-width="1" fill="none" stroke-linecap="round" opacity=".6"/>
+      <path d="M118 94 C136 96 154 108 166 124" stroke="#6655c0" stroke-width="1" fill="none" stroke-linecap="round" opacity=".6"/>
+      <path d="M172 136 C180 154 182 176 180 198 C178 216 172 230 166 238" stroke="#6655c0" stroke-width="1" fill="none" stroke-linecap="round" opacity=".6"/>
+      <!-- Pore central -->
+      <circle cx="100" cy="116" r="2.5" fill="#6655c0" opacity=".6"/>
+    </svg>
+    <div class="hero-ouvretoi">Ouvre-toi !</div>
+  </div>
+</section>
+
+<!-- ── HARVEST ────────────────────────────────────────────── -->
+<section class="harvest">
+  <div class="harvest-inner">
+    <div class="harvest-left fade-in">
+      <div class="harvest-label">Les autres acteurs du marché</div>
+      <div class="harvest-problem">
+        une adresse email.<br>
+        un lien cliquable.<br>
+        des documents qui voyagent en clair.<br>
+        stockés sur des serveurs<br>
+        que vous ne contrôlez pas.<br>
+        des signatures qui ne vous appartiennent plus.<br>
+        un code peut être volé.<br>
+        un mot de passe peut être partagé.<br>
+        rien ne prouve que c'est vous.
+      </div>
+      <div class="harvest-headline">Harvest Now,<br>Decrypt Later.</div>
+    </div>
+    <div class="harvest-right fade-in">
+      <div class="harvest-answer">
+        Avec SÉSAME, vos documents<br>
+        ne transitent <em>nulle part</em>.<br>
+        On ne peut pas récolter<br>
+        ce qui n'existe pas.
+      </div>
+      <div class="harvest-never">Harvest Now,<br>Decrypt Never.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── MANIFESTE ──────────────────────────────────────────── -->
+<section class="manifeste" id="manifeste">
+  <div class="manifeste-label">Notre engagement</div>
+  <div class="manifeste-text">
+    <p class="manifeste-line strong fade-in">Sésame est un outil professionnel</p>
+    <p class="manifeste-line fade-in">d'échanges et de signatures de documents</p>
+    <p class="manifeste-line fade-in">entre parties identifiées.</p>
+    <div class="manifeste-sep"></div>
+    <p class="manifeste-line fade-in">L'expéditeur et le signataire</p>
+    <p class="manifeste-line strong fade-in">sont irréversiblement liés au document.</p>
+    <p class="manifeste-line italic fade-in">Mathématiquement authentifiés.</p>
+    <div class="manifeste-sep"></div>
+    <p class="manifeste-line fade-in">Chaque signature produit un certificat.</p>
+    <p class="manifeste-line strong fade-in">Valeur juridique probatoire.</p>
+    <p class="manifeste-line fade-in">Conforme eIDAS 2.</p>
+    <p class="manifeste-line italic fade-in">La preuve est là. Pour toujours.</p>
+    <div class="manifeste-sep"></div>
+    <p class="manifeste-line fade-in">Sans tiers de confiance.</p>
+    <p class="manifeste-line strong fade-in">Sans serveur.</p>
+    <p class="manifeste-line fade-in">Vos documents sont à vous.</p>
+    <p class="manifeste-line italic fade-in">Pour toujours.</p>
+  </div>
+</section>
+
+<!-- ── COMMENT ────────────────────────────────────────────── -->
+<section class="comment" id="comment">
+  <div class="section-label">Fonctionnement — trois étapes</div>
+  <div class="steps">
+    <div class="step fade-in">
+      <div class="step-num">01</div>
+      <div class="step-title">Échangez vos identités</div>
+      <div class="step-desc">Chaque utilisateur possède une identité Sésame — clé cryptographique liée à son matériel physique et à sa biométrie. Vous l'échangez une seule fois avec vos contacts. Une seule fois.</div>
+    </div>
+    <div class="step fade-in">
+      <div class="step-num">02</div>
+      <div class="step-title">Signez et envoyez</div>
+      <div class="step-desc">Posez votre doigt. Votre biométrie, votre matériel et votre document sont fusionnés irréversiblement en une preuve unique. Le document chiffré est indistinguable du bruit. Illisible pour tous — sauf votre destinataire.</div>
+    </div>
+    <div class="step fade-in">
+      <div class="step-num">03</div>
+      <div class="step-title">La preuve est là</div>
+      <div class="step-desc">Un certificat autonome est produit. Vérifiable par toute partie disposant de votre clé publique. Sans serveur. Sans infrastructure centrale. Pour toujours — même si Sésame disparaît demain.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── POUR QUI ───────────────────────────────────────────── -->
+<section class="pourqui">
+  <div class="section-label">Pour qui</div>
+  <div class="pourqui-grid">
+    <div class="pourqui-item fade-in">
+      <div class="pourqui-icon">Droit</div>
+      <div class="pourqui-title">Avocats & Notaires</div>
+      <div class="pourqui-desc">Actes authentiques, conclusions, mandats. Preuve de signature opposable sans plateforme tierce soumise au Cloud Act.</div>
+    </div>
+    <div class="pourqui-item fade-in">
+      <div class="pourqui-icon">Santé</div>
+      <div class="pourqui-title">Médecins & Hôpitaux</div>
+      <div class="pourqui-desc">Ordonnances, consentements éclairés, dossiers médicaux. Confidentialité absolue. Aucune donnée sur aucun serveur.</div>
+    </div>
+    <div class="pourqui-item fade-in">
+      <div class="pourqui-icon">Finance</div>
+      <div class="pourqui-title">Banques & Assurances</div>
+      <div class="pourqui-desc">Mandats, délégations, souscriptions. Signature hardware-bound — personne ne peut signer à la place de votre client.</div>
+    </div>
+    <div class="pourqui-item fade-in">
+      <div class="pourqui-icon">Entreprise</div>
+      <div class="pourqui-title">Directions juridiques</div>
+      <div class="pourqui-desc">Documents sensibles, propriété intellectuelle, accords de confidentialité. Souveraineté totale. Conformité RGPD native.</div>
+    </div>
+    <div class="pourqui-item fade-in">
+      <div class="pourqui-icon">Immobilier</div>
+      <div class="pourqui-title">Agents & Promoteurs</div>
+      <div class="pourqui-desc">Mandats de vente, états des lieux, offres d'achat. Preuve de présence physique du signataire à l'instant de la signature.</div>
+    </div>
+    <div class="pourqui-item fade-in">
+      <div class="pourqui-icon">Particuliers</div>
+      <div class="pourqui-title">Tout professionnel</div>
+      <div class="pourqui-desc">Qui engage sa signature et refuse de la confier à une plateforme américaine soumise au Cloud Act. Vous signez. Personne d'autre.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── BREVETS ────────────────────────────────────────────── -->
+<section class="brevets">
+  <div class="section-label">Trois inventions brevetées</div>
+  <div class="brevets-grid">
+    <div class="brevet-item fade-in">
+      <div class="brevet-num">Invention 01</div>
+      <div class="brevet-title">Asémantique</div>
+      <div class="brevet-desc">Vos documents chiffrés sont mathématiquement indistinguables du bruit aléatoire. Aucun opérateur réseau, aucun data center ne peut en établir l'existence ni en lire le contenu.</div>
+    </div>
+    <div class="brevet-item fade-in">
+      <div class="brevet-num">Invention 02</div>
+      <div class="brevet-title">Fusion locale</div>
+      <div class="brevet-desc">Votre biométrie, les identifiants matériels de votre dispositif et l'empreinte de votre document sont fusionnés irréversiblement sur votre téléphone. Jamais transmis. Jamais reconstruits.</div>
+    </div>
+    <div class="brevet-item fade-in">
+      <div class="brevet-num">Invention 03</div>
+      <div class="brevet-title">Dérivation cryptographique physique</div>
+      <div class="brevet-desc">Vos clés sont liées à votre matériel physique. Mathématiquement non exportables. Impossibles à cloner. Résistantes aux ordinateurs quantiques — NIST FIPS 203 et 204.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── TARIFS ─────────────────────────────────────────────── -->
+<section class="tarifs" id="tarifs">
+  <div class="section-label">Tarifs</div>
+  <div class="tarifs-grid">
+    <div class="tarif fade-in">
+      <div class="tarif-tag">Découverte</div>
+      <div class="tarif-name">Gratuit</div>
+      <div class="tarif-price">0 €<span>/mois</span></div>
+      <div class="tarif-desc">Pour découvrir Sésame et commencer à constituer votre cercle de confiance.</div>
+      <div class="tarif-sep"></div>
+      <div class="tarif-feature">5 signatures / mois</div>
+      <div class="tarif-feature">Identité Sésame</div>
+      <div class="tarif-feature">Certificats autonomes</div>
+      <div class="tarif-feature">eIDAS 2 conforme</div>
+    </div>
+    <div class="tarif fade-in">
+      <div class="tarif-tag">Professionnel</div>
+      <div class="tarif-name">Essentiel</div>
+      <div class="tarif-price">4 €<span>/mois</span></div>
+      <div class="tarif-desc">Pour le professionnel qui signe régulièrement et exige la souveraineté de ses documents.</div>
+      <div class="tarif-sep"></div>
+      <div class="tarif-feature">30 signatures / mois</div>
+      <div class="tarif-feature">Export certificats PDF</div>
+      <div class="tarif-feature">Contacts illimités</div>
+      <div class="tarif-feature">Support prioritaire</div>
+    </div>
+    <div class="tarif featured fade-in">
+      <div class="tarif-tag">Recommandé</div>
+      <div class="tarif-name">Pro</div>
+      <div class="tarif-price">9 €<span>/mois</span></div>
+      <div class="tarif-desc">Signatures illimitées pour les professionnels à volume élevé. La moitié du prix DocuSign.</div>
+      <div class="tarif-sep"></div>
+      <div class="tarif-feature">Signatures illimitées</div>
+      <div class="tarif-feature">Export certificats PDF</div>
+      <div class="tarif-feature">Historique complet</div>
+      <div class="tarif-feature">API disponible</div>
+    </div>
+    <div class="tarif fade-in">
+      <div class="tarif-tag">Intégration</div>
+      <div class="tarif-name">Entreprise</div>
+      <div class="tarif-price">Sur<span> devis</span></div>
+      <div class="tarif-desc">Licence SDK, intégration dans vos outils métiers, déploiement équipes.</div>
+      <div class="tarif-sep"></div>
+      <div class="tarif-feature">SDK complet</div>
+      <div class="tarif-feature">Intégration sur mesure</div>
+      <div class="tarif-feature">SLA garanti</div>
+      <div class="tarif-feature">Accompagnement dédié</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CONFIANCE ──────────────────────────────────────────── -->
+<section class="confiance fade-in">
+  <div class="confiance-item">
+    <div class="confiance-value">0</div>
+    <div class="confiance-label">serveur qui voit<br>vos documents</div>
+  </div>
+  <div class="confiance-item">
+    <div class="confiance-value">0</div>
+    <div class="confiance-label">tiers de confiance<br>requis</div>
+  </div>
+  <div class="confiance-item">
+    <div class="confiance-value">eIDAS 2</div>
+    <div class="confiance-label">conformité<br>européenne</div>
+  </div>
+  <div class="confiance-item">
+    <div class="confiance-value">FIPS</div>
+    <div class="confiance-label">203 · 204<br>post-quantique</div>
+  </div>
+  <div class="confiance-item">
+    <div class="confiance-value">∞</div>
+    <div class="confiance-label">durée de validité<br>du certificat</div>
+  </div>
+</section>
+
+<!-- ── CONTACT ────────────────────────────────────────────── -->
+<section class="contact" id="contact">
+  <div class="contact-left fade-in">
+    <h2 class="contact-title">Licences<br>& intégrations<br>entreprise.</h2>
+    <p class="contact-sub">Pour les éditeurs de logiciels, les directions juridiques et les acteurs de la signature électronique souhaitant intégrer le protocole SÉSAME dans leur infrastructure.</p>
+    <div class="contact-info">
+      <div>AION ASEMANTIX™</div>
+      <div>Lyon, France · 2026</div>
+      <div><a href="mailto:asemantix@proton.me">asemantix@proton.me</a></div>
+      <div><a href="https://asemantix.tech">asemantix.tech</a></div>
+    </div>
+  </div>
+  <div class="contact-right fade-in">
+    <form onsubmit="handleSubmit(event)">
+      <div class="form-group">
+        <label class="form-label">Nom & Organisation</label>
+        <input class="form-input" type="text" placeholder="Marie Dupont · Cabinet Dupont & Associés" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email professionnel</label>
+        <input class="form-input" type="email" placeholder="m.dupont@cabinet.fr" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Objet de la demande</label>
+        <select class="form-select">
+          <option value="">Sélectionner…</option>
+          <option>Licence SDK entreprise</option>
+          <option>Intégration dans notre produit</option>
+          <option>Démo pour notre équipe</option>
+          <option>Discussion partenariat</option>
+          <option>Accord de confidentialité (NDA)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Message</label>
+        <textarea class="form-textarea" placeholder="Décrivez votre besoin…"></textarea>
+      </div>
+      <button class="form-submit" type="submit">Envoyer la demande</button>
+    </form>
+  </div>
+</section>
+
+<!-- ── FOOTER ─────────────────────────────────────────────── -->
+<footer>
+  <div class="footer-brand">SÉSAME</div>
+  <div class="footer-mid">
+    Signature hardware-bound · Sans serveur · Conforme eIDAS 2<br>
+    Résistant aux ordinateurs quantiques · NIST FIPS 203 & 204
+  </div>
+  <div class="footer-right">
+    AION ASEMANTIX™ · Lyon, 2026<br>
+    asemantix@proton.me
+  </div>
+</footer>
+
+<script>
+// Intersection Observer pour les animations
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry, i) => {
+    if (entry.isIntersecting) {
+      setTimeout(() => {
+        entry.target.classList.add('visible');
+      }, i * 80);
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.12 });
+
+document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+// Placeholder Play Store
+document.getElementById('play-btn').addEventListener('click', (e) => {
+  e.preventDefault();
+  alert('L\'application sera disponible sur Google Play prochainement.\nContactez-nous pour être notifié au lancement.');
+});
+
+// Formulaire
+function handleSubmit(e) {
+  e.preventDefault();
+  const btn = e.target.querySelector('.form-submit');
+  btn.textContent = 'Demande envoyée ✓';
+  btn.style.background = '#2d7a2d';
+  setTimeout(() => {
+    btn.textContent = 'Envoyer la demande';
+    btn.style.background = '';
+    e.target.reset();
+  }, 3000);
+}
+
+// Nav smooth scroll avec offset pour nav fixe
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const href = a.getAttribute('href');
+    if (href === '#') return;
+    const target = document.querySelector(href);
+    if (target) {
+      e.preventDefault();
+      const offset = 72;
+      const top = target.getBoundingClientRect().top + window.scrollY - offset;
+      window.scrollTo({ top, behavior: 'smooth' });
+    }
+  });
+});
+
+// Nav active state
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.nav-links a');
+window.addEventListener('scroll', () => {
+  const nav = document.querySelector('nav');
+  nav.style.borderBottomColor = window.scrollY > 40 
+    ? 'rgba(0,0,0,.1)' 
+    : 'rgba(0,0,0,.07)';
+  
+  let current = '';
+  sections.forEach(s => {
+    if (window.scrollY >= s.offsetTop - 120) current = s.id;
+  });
+  navLinks.forEach(a => {
+    a.style.color = a.getAttribute('href') === '#' + current 
+      ? 'var(--purple)' 
+      : '';
+  });
+});
+</script>
+</body>
+</html>
